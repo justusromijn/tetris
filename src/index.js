@@ -1,30 +1,44 @@
-import { Game } from 'phaser';
-import { PlayScene } from './scenes/play';
-import { HudScene } from './scenes/hud';
+import { Game } from "phaser";
+import { HudScene } from "./scenes/hud";
+import { MenuScene } from "./scenes/menu";
+import { PlayScene } from "./scenes/play";
+import { calculateBoundaries } from "./utils/calculateBoundaries";
 
-let height = document.body.clientHeight;
-let width = document.body.clientWidth;
+const HEIGHT = document.body.clientHeight;
+const WIDTH = document.body.clientWidth;
+const GRID_WIDTH = 10;
+const GRID_HEIGHT = 20;
+const TILE_SIZE = 32;
 
-const config = {
-  type: Phaser.AUTO,
-  width,
-  height,
-  scene: {
-    preload,
-    create,
-    update
-  }
-};
 function preload() {
-  this.load.multiatlas('assets', 'assets/assets.json', 'assets');
+  this.load.multiatlas("assets", "assets/assets.json", "assets");
 }
 function create() {
-  this.scene.start('PlayScene');
-  this.scene.start('HudScene');
+  this.dimensions = calculateBoundaries(this.sys, {
+    width: GRID_WIDTH,
+    height: GRID_HEIGHT,
+    tile: TILE_SIZE
+  });
+  this.scene.start("Menu", {
+    dimensions: this.dimensions,
+    grid: {
+      width: GRID_WIDTH,
+      height: GRID_HEIGHT,
+      tile_size: TILE_SIZE
+    }
+  });
 }
-function update() {}
 
-let game = new Game(config);
+let game = new Game({
+  type: Phaser.AUTO,
+  width: WIDTH,
+  height: HEIGHT,
+  scene: {
+    preload,
+    create
+  }
+});
 
-game.scene.add('PlayScene', PlayScene);
-game.scene.add('HudScene', HudScene);
+game.scene.add("Menu", MenuScene);
+game.scene.add("Play", PlayScene);
+game.scene.add("Hud", HudScene);

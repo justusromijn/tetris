@@ -1,73 +1,54 @@
-import { Scene } from 'phaser';
-import { createStore } from 'redux';
-import { install } from 'redux-loop';
-
-import { tetris } from './tetris.js';
-import { getDimensions } from '../../utils';
-
-const GRID_WIDTH = 10;
-const GRID_HEIGHT = 20;
-const TILE_SIZE = 32;
+import { Scene } from "phaser";
+import { createStore } from "redux";
+import { install } from "redux-loop";
+import { tetris } from "./tetris.js";
 
 export class PlayScene extends Scene {
   constructor(config) {
+    console.log("constructor");
     super(config);
     this.store = null;
     this.dimensions = null;
     this.sprites = null;
     this.ticker = null;
     this.cursors = null;
-    this.keytrackers = {
-      left: null,
-      right: null,
-      down: null,
-      up: null
-    };
   }
 
-  create() {
+  create({ dimensions, grid }) {
+    console.log("creating");
     // redux store
+    this.grid = grid;
     this.store = createStore(tetris, install());
-    this.store
+    this.unsubscribeStore = this.store
       .subscribe(() => {
         this.render(this.store.getState());
       })
       .bind(this);
 
     // input event binding
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.cursors.left.on('down', this.onLeft.bind(this));
-    this.cursors.left.on('up', this.onLeftUp.bind(this));
-    this.cursors.right.on('down', this.onRight.bind(this));
-    this.cursors.right.on('up', this.onRightUp.bind(this));
-    this.cursors.up.on('down', this.onUp.bind(this));
-    this.cursors.up.on('up', this.onUpUp.bind(this));
-    this.cursors.down.on('down', this.onDown.bind(this));
-    this.cursors.down.on('up', this.onDownUp.bind(this));
-    this.cursors.space.on('down', this.onFall.bind(this));
-
-    // get real screen coordinates
-    this.dimensions = getDimensions(this.sys, {
-      width: GRID_WIDTH,
-      height: GRID_HEIGHT,
-      tile: TILE_SIZE
-    });
-
+    if (!this.cursors) {
+      this.cursors = this.input.keyboard.createCursorKeys();
+      this.cursors.left.on("down", this.onLeft.bind(this));
+      this.cursors.right.on("down", this.onRight.bind(this));
+      this.cursors.up.on("down", this.onUp.bind(this));
+      this.cursors.down.on("down", this.onDown.bind(this));
+      this.cursors.space.on("down", this.onFall.bind(this));
+    }
     // add visual background
     this.add.sprite(
-      this.dimensions.center.x,
-      this.dimensions.center.y,
-      'assets',
-      'tetris-border.png'
+      dimensions.center.x,
+      dimensions.center.y,
+      "assets",
+      "tetris-border.png"
     );
 
     // add sprite for each tile
-    this.sprites = Array.from({ length: GRID_HEIGHT }, (_, ri) =>
-      Array.from({ length: GRID_WIDTH }, (_, ci) => {
+    this.sprites = Array.from({ length: grid.height }, (_, ri) =>
+      Array.from({ length: grid.width }, (_, ci) => {
         let sprite = this.add.sprite(
-          this.dimensions.left + ci * TILE_SIZE,
-          this.dimensions.top + ri * TILE_SIZE,
-          'assets',
+          dimensions.left + ci * grid.tile_size,
+          dimensions.top + ri * grid.tile_size,
+          "assets",
           `block-red.png`
         );
         sprite.visible = false;
@@ -76,7 +57,7 @@ export class PlayScene extends Scene {
     );
 
     // start game and ticker
-    this.store.dispatch({ type: 'START' });
+    this.store.dispatch({ type: "START" });
     this.ticker = setTimeout(
       this.onTick.bind(this),
       this.store.getState().speed
@@ -84,12 +65,23 @@ export class PlayScene extends Scene {
   }
 
   render(state) {
+    if (state.gameOver) {
+      this.cursors.left.off("down", this.onLeft);
+      this.cursors.right.off("down", this.onRight);
+      this.cursors.up.off("down", this.onUp);
+      this.cursors.down.off("down", this.onDown);
+      this.cursors.space.off("down", this.onFall);
+      clearTimeout(this.ticker);
+      this.unsubscribeStore();
+      this.scene.start("Menu");
+      return;
+    }
     state.grid.forEach((row, rowIx) => {
       row.forEach((cell, cellIx) => {
         if (cell.fill) {
           this.sprites[rowIx][cellIx].visible = true;
           this.sprites[rowIx][cellIx].setTexture(
-            'assets',
+            "assets",
             `block-${cell.fill}.png`
           );
         } else {
@@ -106,7 +98,7 @@ export class PlayScene extends Scene {
           if (cell) {
             this.sprites[y][x].visible = true;
             this.sprites[y][x].setTexture(
-              'assets',
+              "assets",
               `block-${state.cursor.fill}.png`
             );
           }
@@ -114,54 +106,39 @@ export class PlayScene extends Scene {
       });
     }
   }
+  update() {}
 
   onTick() {
+    if (this.store.getState().gameOver) {
+      return;
+    }
+
     this.ticker = setTimeout(
       this.onTick.bind(this),
       this.store.getState().speed
     );
-    this.store.dispatch({ type: 'DROP' });
-  }
-
-  onKey(key) {
-    this.store.dispatch({ type: INPUT_ACTIONS[key] });
+    this.store.dispatch({ type: "DROP" });
   }
 
   onLeft() {
-    this.store.dispatch({ type: 'MOVE_LEFT' });
-    this.keytrackers.left = setTimeout(this.onLeft.bind(this), 100);
-  }
-  onLeftUp() {
-    clearTimeout(this.keytrackers.left);
+    this.store.dispatch({ type: "MOVE_LEFT" });
   }
 
   onRight() {
-    this.store.dispatch({ type: 'MOVE_RIGHT' });
-    this.keytrackers.right = setTimeout(this.onRight.bind(this), 100);
-  }
-
-  onRightUp() {
-    clearTimeout(this.keytrackers.right);
+    this.store.dispatch({ type: "MOVE_RIGHT" });
   }
 
   onUp() {
-    this.store.dispatch({ type: 'ROTATE_RIGHT' });
-    this.keytrackers.up = setTimeout(this.onUp.bind(this), 100);
+    this.store.dispatch({ type: "ROTATE_RIGHT" });
   }
-  onUpUp() {
-    clearTimeout(this.keytrackers.up);
-  }
+
   onDown() {
-    this.store.dispatch({ type: 'DROP' });
-    this.keytrackers.down = setTimeout(this.onDown.bind(this), 100);
-  }
-  onDownUp() {
-    clearTimeout(this.keytrackers.down);
+    this.store.dispatch({ type: "DROP" });
   }
 
   onFall() {
     clearTimeout(this.ticker);
-    this.store.dispatch({ type: 'FALL' });
+    this.store.dispatch({ type: "FALL" });
     this.ticker = setTimeout(
       this.onTick.bind(this),
       this.store.getState().speed

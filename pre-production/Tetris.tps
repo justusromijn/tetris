@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>4</int>
         <key>texturePackerVersion</key>
-        <string>4.12.1</string>
+        <string>5.0.1</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -132,7 +132,7 @@
             <key>json</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>../dist/assets/assets.json</filename>
+                <filename>../src/assets/assets.json</filename>
             </struct>
         </map>
         <key>multiPack</key>
@@ -216,14 +216,23 @@
         </map>
         <key>fileList</key>
         <array>
-            <filename>../src/assets</filename>
+            <filename>../src/assets/block-aqua.png</filename>
+            <filename>../src/assets/block-blue.png</filename>
+            <filename>../src/assets/block-green.png</filename>
+            <filename>../src/assets/block-orange.png</filename>
+            <filename>../src/assets/block-purple.png</filename>
+            <filename>../src/assets/block-red.png</filename>
+            <filename>../src/assets/block-yellow.png</filename>
+            <filename>../src/assets/tetris-border.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
         <key>replaceList</key>
         <array/>
         <key>ignoredWarnings</key>
-        <array/>
+        <array>
+            <string>phaser3-exporter-beta</string>
+        </array>
         <key>commonDivisorX</key>
         <uint>1</uint>
         <key>commonDivisorY</key>

@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "parcel src/index.html",
-    "build": "parcel build src/index.html"
+    "prestart": "cpy 'src/assets/*.*' dist/assets",
+    "build": "parcel build src/index.html",
+    "prebuild": "cpy 'src/assets/*.*' dist/assets"
   },
   "repository": {
     "type": "git",
@@ -24,6 +26,7 @@
   },
   "homepage": "https://github.com/justusromijn/tetris#readme",
   "devDependencies": {
+    "cpy-cli": "^2.0.0",
     "parcel-bundler": "^1.12.3"
   },
   "dependencies": {
