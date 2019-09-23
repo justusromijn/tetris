@@ -1,6 +1,7 @@
 import { Game } from "phaser";
 import { HudScene } from "./scenes/hud";
-import { hud, menu, play } from "./scenes/keys";
+import { InstructionsScene } from "./scenes/instructions";
+import { hud, instructions, menu, play } from "./scenes/keys";
 import { MenuScene } from "./scenes/menu";
 import { PlayScene } from "./scenes/play";
 import { createCoordinates } from "./utils/coordinates";
@@ -29,3 +30,4 @@ let game = new Game({
 game.scene.add(menu, MenuScene);
 game.scene.add(play, PlayScene);
 game.scene.add(hud, HudScene);
+game.scene.add(instructions, InstructionsScene);
