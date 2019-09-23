@@ -1,21 +1,23 @@
 import { Scene } from "phaser";
 import { createStore } from "redux";
 import { install } from "redux-loop";
+import { getCoordinates } from "../../utils/coordinates";
+import { grid } from "../../utils/grid";
+import { hud, menu } from "../keys";
 import { tetris } from "./tetris.js";
 
 export class PlayScene extends Scene {
   constructor(config) {
     console.log("constructor");
     super(config);
+    this.dimensions = getCoordinates();
     this.store = null;
-    this.dimensions = null;
     this.sprites = null;
     this.ticker = null;
     this.cursors = null;
   }
 
-  create({ dimensions, grid }) {
-    console.log("creating");
+  create() {
     // redux store
     this.grid = grid;
     this.store = createStore(tetris, install());
@@ -36,8 +38,8 @@ export class PlayScene extends Scene {
     }
     // add visual background
     this.add.sprite(
-      dimensions.center.x,
-      dimensions.center.y,
+      this.dimensions.center.x,
+      this.dimensions.center.y,
       "assets",
       "tetris-border.png"
     );
@@ -46,8 +48,8 @@ export class PlayScene extends Scene {
     this.sprites = Array.from({ length: grid.height }, (_, ri) =>
       Array.from({ length: grid.width }, (_, ci) => {
         let sprite = this.add.sprite(
-          dimensions.left + ci * grid.tile_size,
-          dimensions.top + ri * grid.tile_size,
+          this.dimensions.left + ci * grid.tile,
+          this.dimensions.top + ri * grid.tile,
           "assets",
           `block-red.png`
         );
@@ -65,17 +67,24 @@ export class PlayScene extends Scene {
   }
 
   render(state) {
+    this.events.emit("change", state);
+
+    // GAME OVER
     if (state.gameOver) {
       this.cursors.left.off("down", this.onLeft);
       this.cursors.right.off("down", this.onRight);
       this.cursors.up.off("down", this.onUp);
       this.cursors.down.off("down", this.onDown);
       this.cursors.space.off("down", this.onFall);
+
       clearTimeout(this.ticker);
       this.unsubscribeStore();
-      this.scene.start("Menu");
+      this.scene.stop(hud);
+      this.scene.start(menu);
       return;
     }
+
+    // DROPPED BLOCKS
     state.grid.forEach((row, rowIx) => {
       row.forEach((cell, cellIx) => {
         if (cell.fill) {
@@ -89,6 +98,8 @@ export class PlayScene extends Scene {
         }
       });
     });
+
+    // CURRENT BLOCK
     if (state.cursor.shape) {
       state.cursor.shape.forEach((row, rowIx) => {
         row.forEach((cell, cellIx) => {

@@ -1,5 +1,5 @@
-export * from "./calculateBoundaries";
 export * from "./clone";
+export * from "./coordinates";
 export * from "./hasCollision";
 export * from "./matrixRotate";
 export * from "./noop";
