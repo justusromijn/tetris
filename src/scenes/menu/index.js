@@ -1,44 +1,39 @@
-// Scene for main menu...
 import { Scene } from "phaser";
+import { getCoordinates } from "../../utils/coordinates";
+import { addMenuItem, FONT } from "../../utils/text";
+import { hud, play } from "../keys";
 
 const MENU_ITEMS = [
-  { text: "NEW GAME", scene: "Play" },
-  { text: "CREDITS" },
-  { text: "INSTRUCTIONS" }
+  { text: "NEW GAME", scenes: [hud, play] },
+  { text: "INSTRUCTIONS", scenes: [] }
 ];
-const FONT_SIZE = 30;
-const BASE_OFFSET = -((MENU_ITEMS.length * (FONT_SIZE + 10)) / 2);
+const BASE_OFFSET = -((MENU_ITEMS.length * (FONT.size + 10)) / 2);
 
 export class MenuScene extends Scene {
   constructor(config) {
     super(config);
     this.selectedItem = 0;
     this.menuItems = [];
+    this.dimensions = getCoordinates();
   }
 
-  create({ dimensions, grid }) {
-    this.dimensions = dimensions;
-    this.grid = grid;
+  create() {
     if (!this.cursors) {
+      this.enter = this.input.keyboard.addKey("ENTER");
+      this.enter.on("down", this.onSelect.bind(this));
       this.cursors = this.input.keyboard.createCursorKeys();
       this.cursors.up.on("down", this.onUp.bind(this));
       this.cursors.down.on("down", this.onDown.bind(this));
-      this.cursors.space.on("down", this.onSpace.bind(this));
+      this.cursors.space.on("down", this.onSelect.bind(this));
     }
 
     this.menuItems = MENU_ITEMS.map(({ text }, index) => {
-      let menuItem = this.add.text(
-        dimensions.center.x,
-        dimensions.center.y + BASE_OFFSET + index * (FONT_SIZE + 10),
-        text,
-        {
-          fontFamily: '"Tahoma", sans-serif',
-          fontSize: FONT_SIZE + "px"
-        }
+      return addMenuItem(
+        this,
+        this.dimensions.center.x,
+        this.dimensions.center.y + BASE_OFFSET + index * (FONT.size + 10),
+        text
       );
-      menuItem.setColor("#505050");
-      menuItem.setOrigin(0.5, 0.5);
-      return menuItem;
     });
   }
 
@@ -57,10 +52,9 @@ export class MenuScene extends Scene {
     this.selectedItem =
       this.selectedItem === MENU_ITEMS.length - 1 ? 0 : this.selectedItem + 1;
   }
-  onSpace() {
-    this.scene.start(MENU_ITEMS[this.selectedItem].scene, {
-      dimensions: this.dimensions,
-      grid: this.grid
+  onSelect() {
+    MENU_ITEMS[this.selectedItem].scenes.forEach(scene => {
+      this.scene.start(scene);
     });
   }
 }
