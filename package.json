@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "parcel src/index.html",
     "prestart": "cpy 'src/assets/*.*' dist/assets",
-    "build": "parcel build src/index.html",
-    "prebuild": "cpy 'src/assets/*.*' dist/assets"
+    "build": "parcel build src/index.html --out-dir docs --public-url /tetris/",
+    "prebuild": "cpy 'src/assets/*.*' docs/assets"
   },
   "repository": {
     "type": "git",

@@ -22,7 +22,7 @@ const height = document.body.clientHeight;
 createCoordinates(width, height);
 
 function preload() {
-  this.load.multiatlas("assets", "assets/assets.json", "assets");
+  this.load.multiatlas("assets", "./assets/assets.json", "assets");
 }
 function create() {
   this.scene.start(menu);
