@@ -1,9 +1,20 @@
 import { Game } from "phaser";
-import { HudScene } from "./scenes/hud";
-import { InstructionsScene } from "./scenes/instructions";
-import { hud, instructions, menu, play } from "./scenes/keys";
-import { MenuScene } from "./scenes/menu";
-import { PlayScene } from "./scenes/play";
+import {
+  GameOverScene,
+  HighscoresScene,
+  HudScene,
+  InstructionsScene,
+  MenuScene,
+  PlayScene
+} from "./scenes";
+import {
+  game_over,
+  highscores,
+  hud,
+  instructions,
+  menu,
+  play
+} from "./scenes/keys";
 import { createCoordinates } from "./utils/coordinates";
 
 const width = document.body.clientWidth;
@@ -31,3 +42,5 @@ game.scene.add(menu, MenuScene);
 game.scene.add(play, PlayScene);
 game.scene.add(hud, HudScene);
 game.scene.add(instructions, InstructionsScene);
+game.scene.add(game_over, GameOverScene);
+game.scene.add(highscores, HighscoresScene);
