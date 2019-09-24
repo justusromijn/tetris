@@ -1,6 +1,6 @@
 import { Scene } from "phaser";
 import { getCoordinates } from "../../utils/coordinates";
-import { addMultilineText } from "../../utils/text";
+import { addText } from "../../utils/text";
 import { menu } from "../keys";
 
 export class InstructionsScene extends Scene {
@@ -16,38 +16,67 @@ export class InstructionsScene extends Scene {
       this.enter.on("down", this.onEnter.bind(this));
     }
 
-    this.instructions = addMultilineText(
+    this.header = addText(
       this,
       this.dimensions.center.x - 200,
       this.dimensions.center.y - 300,
+      [{ text: "INSTRUCTIONS", style: "title" }]
+    );
+    this.controlsHeader = addText(
+      this,
+      this.dimensions.center.x - 200,
+      this.dimensions.center.y - 220,
+      [{ text: "CONTROLS", style: "heading" }]
+    );
+
+    this.controls = addText(
+      this,
+      this.dimensions.center.x - 200,
+      this.dimensions.center.y - 160,
+      [{ text: "<LEFT>\n<RIGHT>\n<DOWN>\n<UP>\n<SPACE>" }]
+    );
+    this.controlsExplanation = addText(
+      this,
+      this.dimensions.center.x - 100,
+      this.dimensions.center.y - 160,
       [
-        { text: "INSTRUCTIONS", type: "title" },
-        { text: "CONTROLS", type: "heading" },
         {
           text:
-            "Use <LEFT>, <RIGHT> and <DOWN> arrow keys to move the block. Use <UP> arrow key to rotate. Use <SPACE> to directly drop the current block to the floor.",
-          type: "text"
-        },
-        { text: "SCORE", type: "heading" },
-        {
-          text:
-            "For a single row you get 1 point. If you complete 2 rows with one block, you get 3 points. For 3 rows you get 6 points, and 4 rows yields 10 points.",
-          type: "text"
-        },
-        { text: "LEVEL", type: "heading" },
-        {
-          text:
-            "After a certain amount of points you will advance a level. This means that the blocks will drop a bit faster by themselves.",
-          type: "text"
-        },
-        {
-          text: "Press <ENTER> to return to the menu.",
-          type: "text"
+            "move current block to the left\nmove current block to the right\nmove current block down\nrotate current block\ndirectly drop the current block to the floor"
         }
       ]
     );
-    // this.dimensions.center.x,
-    // this.dimensions.center.y + BASE_OFFSET + index * (FONT.size + 10),
+    this.scoreHeader = addText(
+      this,
+      this.dimensions.center.x - 200,
+      this.dimensions.center.y,
+      [
+        { text: "SCORE", style: "heading" },
+        {
+          text:
+            "For each completed row you get points. If you complete multiple rows with a single block, you can generate bonus points."
+        }
+      ]
+    );
+    this.scoring = addText(
+      this,
+      this.dimensions.center.x - 200,
+      this.dimensions.center.y + 160,
+      [{ text: "ONE ROW\nTWO ROWS\nTHREE ROWS\nFOUR ROWS\n" }]
+    );
+    this.scoringExplanation = addText(
+      this,
+      this.dimensions.center.x - 60,
+      this.dimensions.center.y + 160,
+      [{ text: "1 point\n3 points\n6 points\n10 points\n" }]
+    );
+
+    this.outro = addText(
+      this,
+      this.dimensions.center.x - 200,
+      this.dimensions.center.y + 300,
+      [{ text: "Press <ENTER> to return to the menu" }]
+    );
   }
 
   update() {}

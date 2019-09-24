@@ -1,13 +1,13 @@
 import { Scene } from "phaser";
 import { getCoordinates } from "../../utils/coordinates";
-import { addMenuItem, FONT } from "../../utils/text";
-import { hud, instructions, play } from "../keys";
+import { addText } from "../../utils/text";
+import { highscores, hud, instructions, play } from "../keys";
 
 const MENU_ITEMS = [
-  { text: "NEW GAME", scenes: [hud, play] },
-  { text: "INSTRUCTIONS", scenes: [instructions] }
+  { text: "NEW GAME", style: "heading", scenes: [hud, play] },
+  { text: "HIGHSCORES", style: "heading", scenes: [highscores] },
+  { text: "INSTRUCTIONS", style: "heading", scenes: [instructions] }
 ];
-const BASE_OFFSET = -((MENU_ITEMS.length * (FONT.size + 10)) / 2);
 
 export class MenuScene extends Scene {
   constructor(config) {
@@ -26,34 +26,42 @@ export class MenuScene extends Scene {
       this.cursors.down.on("down", this.onDown.bind(this));
     }
 
-    this.menuItems = MENU_ITEMS.map(({ text }, index) => {
-      return addMenuItem(
-        this,
-        this.dimensions.center.x,
-        this.dimensions.center.y + BASE_OFFSET + index * (FONT.size + 10),
-        text
-      );
-    });
+    this.menuHeader = addText(
+      this,
+      this.dimensions.center.x - 200,
+      this.dimensions.center.y - 300,
+      [{ text: "TETRIS", style: "title" }]
+    );
+    this.menuItems = addText(
+      this,
+      this.dimensions.center.x - 200,
+      this.dimensions.center.y - 200,
+      MENU_ITEMS
+    );
+    this.highlightSelection();
   }
 
-  update() {
-    this.menuItems.forEach((item, index) => {
-      let color = index === this.selectedItem ? "#f9f9f9" : "#909090";
-      item.setColor(color);
-    });
-  }
+  update() {}
 
   onUp() {
     this.selectedItem =
       this.selectedItem === 0 ? MENU_ITEMS.length - 1 : this.selectedItem - 1;
+    this.highlightSelection();
   }
   onDown() {
     this.selectedItem =
       this.selectedItem === MENU_ITEMS.length - 1 ? 0 : this.selectedItem + 1;
+    this.highlightSelection();
   }
   onSelect() {
     MENU_ITEMS[this.selectedItem].scenes.forEach(scene => {
       this.scene.start(scene);
+    });
+  }
+  highlightSelection() {
+    this.menuItems.forEach((item, index) => {
+      let color = index === this.selectedItem ? "#f9f9f9" : "#909090";
+      item.setColor(color);
     });
   }
 }

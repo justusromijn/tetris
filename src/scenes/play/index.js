@@ -3,7 +3,7 @@ import { createStore } from "redux";
 import { install } from "redux-loop";
 import { getCoordinates } from "../../utils/coordinates";
 import { grid } from "../../utils/grid";
-import { hud, menu } from "../keys";
+import { game_over, hud } from "../keys";
 import { tetris } from "./tetris.js";
 
 export class PlayScene extends Scene {
@@ -80,7 +80,7 @@ export class PlayScene extends Scene {
       clearTimeout(this.ticker);
       this.unsubscribeStore();
       this.scene.stop(hud);
-      this.scene.start(menu);
+      this.scene.start(game_over, { score: state.score });
       return;
     }
 
